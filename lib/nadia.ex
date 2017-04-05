@@ -16,8 +16,8 @@ defmodule Nadia do
   A simple method for testing your bot's auth token. Requires no parameters.
   Returns basic information about the bot in form of a User object.
   """
-  @spec get_me :: {:ok, User.t} | {:error, Error.t}
-  def get_me, do: request("getMe")
+  @spec get_me([{atom, any}]) :: {:ok, User.t} | {:error, Error.t}
+  def get_me(options \\ []), do: request("getMe", options)
 
   @doc """
   Use this method to send text messages.
@@ -56,9 +56,9 @@ defmodule Nadia do
   * `:disable_notification` - Sends the message silently or without notification
   * `message_id` - Unique message identifier
   """
-  @spec forward_message(integer, integer, integer) :: {:ok, Message.t} | {:error, Error.t}
-  def forward_message(chat_id, from_chat_id, message_id) do
-    request("forwardMessage", chat_id: chat_id, from_chat_id: from_chat_id, message_id: message_id)
+  @spec forward_message(integer, integer, integer, [{atom, any}]) :: {:ok, Message.t} | {:error, Error.t}
+  def forward_message(chat_id, from_chat_id, message_id, options \\ []) do
+    request("forwardMessage", [chat_id: chat_id, from_chat_id: from_chat_id, message_id: message_id] ++ options)
   end
 
   @doc """
@@ -82,7 +82,7 @@ defmodule Nadia do
   """
   @spec send_photo(integer, binary, [{atom, any}]) :: {:ok, Message.t} | {:error, Error.t}
   def send_photo(chat_id, photo, options \\ []) do
-    request("sendPhoto", [chat_id: chat_id, photo: photo] ++ options, :photo)
+    request("sendPhoto", [chat_id: chat_id, photo: photo] ++ options) 
   end
 
   @doc """
@@ -318,9 +318,9 @@ defmodule Nadia do
       * `upload_document` for general files
       * `find_location` for location data
   """
-  @spec send_chat_action(integer, binary) :: :ok | {:error, Error.t}
-  def send_chat_action(chat_id, action) do
-    request("sendChatAction", chat_id: chat_id, action: action)
+  @spec send_chat_action(integer, binary, [{atom, any}]) :: :ok | {:error, Error.t}
+  def send_chat_action(chat_id, action, options \\ []) do
+    request("sendChatAction", [chat_id: chat_id, action: action] ++ options)
   end
 
   @doc """
@@ -391,8 +391,8 @@ defmodule Nadia do
   Args:
   * `file_id` - File identifier to get info about
   """
-  @spec get_file(binary) :: {:ok, File.t} | {:error, Error.t}
-  def get_file(file_id), do: request("getFile", file_id: file_id)
+  @spec get_file(binary, [{atom, any}]) :: {:ok, File.t} | {:error, Error.t}
+  def get_file(file_id, options), do: request("getFile", [file_id: file_id] ++ options)
 
   @doc ~S"""
   Use this method to get link for file for subsequent use.
@@ -404,9 +404,9 @@ defmodule Nadia do
       "https://api.telegram.org/file/bot#{Application.get_env(:nadia, :token)}/document/file_10"}
 
   """
-  @spec get_file_link(File.t) :: {:ok, binary} | {:error, Error.t}
-  def get_file_link(file) do
-    token = Application.get_env(:nadia, :token)
+  @spec get_file_link(File.t, [{atom, any}]) :: {:ok, binary} | {:error, Error.t}
+  def get_file_link(file, options \\ []) do
+    token = Keyword.get(options, :token) || Application.get_env(:nadia, :token)
     {:ok, @base_file_url <> token <> "/" <> file.file_path}
   end
 
@@ -425,9 +425,9 @@ defmodule Nadia do
   (in the format @supergroupusername)
   * `user_id` - Unique identifier of the target user
   """
-  @spec kick_chat_member(integer | binary, integer) :: :ok | {:error, Error.t}
-  def kick_chat_member(chat_id, user_id) do
-    request("kickChatMember", chat_id: chat_id, user_id: user_id)
+  @spec kick_chat_member(integer | binary, integer, [{atom, any}]) :: :ok | {:error, Error.t}
+  def kick_chat_member(chat_id, user_id, options \\ []) do
+    request("kickChatMember", [chat_id: chat_id, user_id: user_id] ++ options)
   end
 
   @doc """
@@ -438,9 +438,9 @@ defmodule Nadia do
   * `chat_id` - Unique identifier for the target chat or username of the target supergroup or
   channel (in the format @supergroupusername)
   """
-  @spec leave_chat(integer | binary) :: :ok | {:error, Error.t}
-  def leave_chat(chat_id) do
-    request("leaveChat", chat_id: chat_id)
+  @spec leave_chat(integer | binary,  [{atom, any}]) :: :ok | {:error, Error.t}
+  def leave_chat(chat_id, options \\ []) do
+    request("leaveChat", [chat_id: chat_id] ++ options)
   end
 
   @doc """
@@ -453,9 +453,9 @@ defmodule Nadia do
   (in the format @supergroupusername)
   * `user_id` - Unique identifier of the target user
   """
-  @spec unban_chat_member(integer | binary, integer) :: :ok | {:error, Error.t}
-  def unban_chat_member(chat_id, user_id) do
-    request("unbanChatMember", chat_id: chat_id, user_id: user_id)
+  @spec unban_chat_member(integer | binary, integer, [{atom, any}]) :: :ok | {:error, Error.t}
+  def unban_chat_member(chat_id, user_id, options) do
+    request("unbanChatMember", [chat_id: chat_id, user_id: user_id], options)
   end
 
   @doc """
@@ -467,9 +467,9 @@ defmodule Nadia do
   * `chat_id` - Unique identifier for the target chat or username of the target supergroup or
   channel (in the format @supergroupusername)
   """
-  @spec get_chat(integer | binary) :: {:ok, Chat.t} | {:error, Error.t}
-  def get_chat(chat_id) do
-    request("getChat", chat_id: chat_id)
+  @spec get_chat(integer | binary,  [{atom, any}]) :: {:ok, Chat.t} | {:error, Error.t}
+  def get_chat(chat_id, options \\ []) do
+    request("getChat", [chat_id: chat_id] ++ options)
   end
 
   @doc """
@@ -482,9 +482,9 @@ defmodule Nadia do
   * `chat_id` - Unique identifier for the target chat or username of the target supergroup or
   channel (in the format @channelusername)
   """
-  @spec get_chat_administrators(integer | binary) :: {:ok, [ChatMember.t]} | {:error, Error.t}
-  def get_chat_administrators(chat_id) do
-    request("getChatAdministrators", chat_id: chat_id)
+  @spec get_chat_administrators(integer | binary, [{atom, any}]) :: {:ok, [ChatMember.t]} | {:error, Error.t}
+  def get_chat_administrators(chat_id, options \\ []) do
+    request("getChatAdministrators", [chat_id: chat_id] ++ options)
   end
 
   @doc """
@@ -494,9 +494,9 @@ defmodule Nadia do
   * `chat_id` - Unique identifier for the target chat or username of the target supergroup or
   channel (in the format @channelusername)
   """
-  @spec get_chat_members_count(integer | binary) :: {:ok, integer} | {:error, Error.t}
-  def get_chat_members_count(chat_id) do
-    request("getChatMembersCount", chat_id: chat_id)
+  @spec get_chat_members_count(integer | binary, [{atom, any}]) :: {:ok, integer} | {:error, Error.t}
+  def get_chat_members_count(chat_id, options \\ []) do
+    request("getChatMembersCount", [chat_id: chat_id] ++ options)
   end
 
   @doc """
@@ -508,11 +508,11 @@ defmodule Nadia do
   channel (in the format @channelusername)
   * `user_id` - Unique identifier of the target user
   """
-  @spec get_chat_member(integer | binary, integer) :: {:ok, ChatMember.t} | {:error, Error.t}
-  def get_chat_member(chat_id, user_id) do
-    request("getChatMember", chat_id: chat_id, user_id: user_id)
+  @spec get_chat_member(integer | binary, integer, [{atom, any}]) :: {:ok, ChatMember.t} | {:error, Error.t}
+  def get_chat_member(chat_id, user_id, options \\ []) do
+    request("getChatMember", [chat_id: chat_id, user_id: user_id] ++ options)
   end
-  
+
   @doc """
   Use this method to send answers to callback queries sent from inline keyboards.
   The answer will be displayed to the user as a notification at the top of the chat
