@@ -24,7 +24,6 @@ defmodule Nadia.API do
     end
   end
 
-  defp build_url(method), do: @base_url <> token() <> "/" <> method
   defp build_url(method, token), do: @base_url <> token <> "/" <> method
 
   defp process_response(response, method) do
@@ -100,9 +99,8 @@ defmodule Nadia.API do
   * `file_field` - specify the key of file_field in `options` when sending files
   """
   def request(method, options \\ [], file_field \\ nil) do
-    { token, options } = Keyword.pop(options, :token)
-    url = if is_binary(token), do: build_url(method, token), else: build_url(method)
-    url
+    { token, options } = Keyword.pop(options, :token, token())
+    build_url(method, token)
     |> HTTPoison.post(build_request(options, file_field), [], build_options(options))
     |> process_response(method)
   end

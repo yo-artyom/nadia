@@ -392,7 +392,7 @@ defmodule Nadia do
   * `file_id` - File identifier to get info about
   """
   @spec get_file(binary, [{atom, any}]) :: {:ok, File.t} | {:error, Error.t}
-  def get_file(file_id, options), do: request("getFile", [file_id: file_id] ++ options)
+  def get_file(file_id, options \\ []), do: request("getFile", [file_id: file_id] ++ options)
 
   @doc ~S"""
   Use this method to get link for file for subsequent use.
@@ -406,7 +406,8 @@ defmodule Nadia do
   """
   @spec get_file_link(File.t, [{atom, any}]) :: {:ok, binary} | {:error, Error.t}
   def get_file_link(file, options \\ []) do
-    token = Keyword.get(options, :token) || Application.get_env(:nadia, :token)
+    token = Keyword.get(options, :token) ||
+    Application.get_env(:nadia, :token)
     {:ok, @base_file_url <> token <> "/" <> file.file_path}
   end
 
